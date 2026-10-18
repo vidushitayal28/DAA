@@ -1,0 +1,104 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_VERTICES 100
+
+// Graph represented using adjacency list
+typedef struct Node {
+    int vertex;
+    struct Node* next;
+} Node;
+
+Node* adjList[MAX_VERTICES];
+int visited[MAX_VERTICES];
+
+// Function to create a new adjacency list node
+Node* createNode(int vertex) {
+    //write your code here...
+    Node* node = (Node*)malloc(sizeof(Node));
+    node->vertex = vertex;
+    node->next = NULL;
+    return node;    
+    
+    
+    
+}
+
+// Function to add an edge to the graph
+void addEdge(int u, int v) {
+    //write your code here...
+    Node* node = createNode(v);
+    node->next = adjList[u];
+    adjList[u] = node;
+    
+    
+    
+    
+}
+
+// Function to sort the adjacency list for each vertex
+void sortAdjList(int V) {
+    //write your code here...
+     int i;
+    Node *a, *b;
+    for (i = 0; i < V; i++) {
+        for (a = adjList[i]; a != NULL; a = a->next) {
+            for (b = a->next; b != NULL; b = b->next) {
+                if (b->vertex < a->vertex) {
+                    int t = a->vertex;
+                    a->vertex = b->vertex;
+                    b->vertex = t;
+                }
+            }
+        }
+	}
+    
+    
+    
+}
+
+// Depth-First Search (DFS) function
+void DFS(int start) {
+    //write your code here...
+    
+    Node* p;
+    visited[start] = 1;
+    printf("%d ", start);
+    for (p = adjList[start]; p != NULL; p = p->next)
+        if (!visited[p->vertex])
+            DFS(p->vertex);
+    
+    
+    
+}
+
+int main() {
+    int V, E;
+    int u, v, start;
+
+    // Read number of vertices and edges
+    scanf("%d %d", &V, &E);
+
+    // Initialize adjacency list
+    for (int i = 0; i < V; i++) {
+        adjList[i] = NULL;
+        visited[i] = 0;
+    }
+
+    // Read the edges
+    for (int i = 0; i < E; i++) {
+        scanf("%d %d", &u, &v);
+        addEdge(u, v);
+    }
+
+    // Sort the adjacency list for each vertex
+    sortAdjList(V);
+
+    // Read the starting node
+    scanf("%d", &start);
+
+    // Perform DFS starting from the given node
+    DFS(start);
+
+    return 0;
+}
