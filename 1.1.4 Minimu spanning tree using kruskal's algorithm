@@ -1,0 +1,93 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+//VIDUSHI TAYAL 25070521075
+
+void kruskalMST(int **cost, int V) {
+    // Step 1: collect all edges from the upper triangular part
+    int maxEdges = V * (V - 1) / 2;
+    int *u = (int *)malloc(maxEdges * sizeof(int));
+    int *v = (int *)malloc(maxEdges * sizeof(int));
+    int *w = (int *)malloc(maxEdges * sizeof(int));
+    int edgeCount = 0;
+
+    for (int i = 0; i < V; i++) {
+        for (int j = i + 1; j < V; j++) {
+            if (cost[i][j] != 9999) {
+                u[edgeCount] = i;
+                v[edgeCount] = j;
+                w[edgeCount] = cost[i][j];
+                edgeCount++;
+            }
+        }
+	}
+	// Step 2: sort edges by weight ascending (stable, so equal-weight
+    // edges keep their row-wise collection order)
+    for (int i = 0; i < edgeCount - 1; i++) {
+        for (int j = 0; j < edgeCount - 1 - i; j++) {
+            if (w[j] > w[j + 1]) {
+                int tmp;
+                tmp = w[j]; w[j] = w[j + 1]; w[j + 1] = tmp;
+                tmp = u[j]; u[j] = u[j + 1]; u[j + 1] = tmp;
+                tmp = v[j]; v[j] = v[j + 1]; v[j + 1] = tmp;
+            }
+        }
+    }
+	// Step 3: union-find setup
+    int *parent = (int *)malloc(V * sizeof(int));
+    for (int i = 0; i < V; i++)
+        parent[i] = i;
+    // find with path compression
+    int find(int x); // forward-declared below via helper approach not valid in C for nested;
+    // (see note below the code block)
+
+    // Step 4: process edges in sorted order
+    int edgesUsed = 0;
+    int totalCost = 0;
+
+    for (int i = 0; i < edgeCount && edgesUsed < V - 1; i++) {
+        int x = u[i], y = v[i];
+
+        // find root of x
+        int rx = x;
+        while (parent[rx] != rx) rx = parent[rx];
+        // find root of y
+        int ry = y;
+        while (parent[ry] != ry) ry = parent[ry];
+		if (rx != ry) {
+            printf("Edge %d:(%d, %d) cost:%d\n", edgesUsed, x, y, w[i]);
+            totalCost += w[i];
+            parent[rx] = ry;
+            edgesUsed++;
+        }
+    }
+    printf("Minimum cost= %d\n", totalCost);
+
+    free(u);
+    free(v);
+    free(w);
+    free(parent);
+}
+int main() {
+    int V;
+    printf("No of vertices: ");
+    scanf("%d", &V);
+
+    int **cost = (int **)malloc(V * sizeof(int *));
+    for (int i = 0; i < V; i++)
+        cost[i] = (int *)malloc(V * sizeof(int));
+
+    printf("Adjacency matrix:\n");
+    for (int i = 0; i < V; i++)
+        for (int j = 0; j < V; j++)
+            scanf("%d", &cost[i][j]);
+
+    kruskalMST(cost, V);
+
+    for (int i = 0; i < V; i++)
+        free(cost[i]);
+    free(cost);
+
+    return 0;
+}
