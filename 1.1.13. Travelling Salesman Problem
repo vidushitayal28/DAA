@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define INF 1000000000
+
+int main() {
+    int n, i, j, mask, last;
+    scanf("%d", &n);
+    int **c = malloc(n * sizeof(int *));
+    for (i = 0; i < n; i++) {
+        c[i] = malloc(n * sizeof(int));
+        for (j = 0; j < n; j++) {
+            scanf("%d", &c[i][j]);
+            if (c[i][j] < 0)
+                c[i][j] = INF;
+        }
+    }
+
+    int full = 1 << n;
+    int *dp = malloc((size_t)full * n * sizeof(int));
+    for (i = 0; i < full * n; i++)
+        dp[i] = INF;
+    dp[1 * n + 0] = 0;
+
+    for (mask = 1; mask < full; mask++) {
+        if (!(mask & 1))
+            continue;
+        for (last = 0; last < n; last++) {
+            int cur = dp[mask * n + last];
+            if (cur >= INF || !(mask & (1 << last)))
+                continue;
+            for (j = 0; j < n; j++) {
+                if ((mask & (1 << j)) || c[last][j] >= INF)
+                    continue;
+                int nm = mask | (1 << j);
+                int val = cur + c[last][j];
+                if (val < dp[nm * n + j])
+                    dp[nm * n + j] = val;
+            }
+        }
+    }
+
+    int best = INF;
+    for (last = 0; last < n; last++) {
+        int cur = dp[(full - 1) * n + last];
+        if (cur < INF && c[last][0] < INF && cur + c[last][0] < best)
+            best = cur + c[last][0];
+    }
+    if (n == 1)
+        best = 0;
+    printf("%d\n", best >= INF ? -1 : best);
+    return 0;
+}
