@@ -1,0 +1,57 @@
+//VIDUSHI TAYAL 25070521075
+
+#include <stdio.h>
+#include <stdlib.h>
+#define INF 1000000000000LL
+int main() {
+	int V, E, i, j, s;
+    scanf("%d %d", &V, &E);
+int *u = malloc(E * sizeof(int));
+    int *v = malloc(E * sizeof(int));
+    long long *w = malloc(E * sizeof(long long));
+    for (i = 0; i < E; i++)
+        scanf("%d %d %lld", &u[i], &v[i], &w[i]);
+    scanf("%d", &s);
+long long d[1005];
+    int p[1005];
+    for (i = 1; i <= V; i++) {
+        d[i] = INF;
+        p[i] = -1;
+    }
+    d[s] = 0;
+for (i = 1; i < V; i++) {
+        for (j = 0; j < E; j++) {
+            if (d[u[j]] != INF && d[u[j]] + w[j] < d[v[j]]) {
+                d[v[j]] = d[u[j]] + w[j];
+                p[v[j]] = u[j];
+            }
+        }
+	}
+	for (j = 0; j < E; j++) {
+        if (d[u[j]] != INF && d[u[j]] + w[j] < d[v[j]]) {
+            printf("Negative cycle detected\n");
+            return 0;
+        }
+    }
+ for (i = 1; i <= V; i++) {
+    if (i == s)
+            continue;
+        if (d[i] == INF) {
+            printf("%d INF None\n", i);
+            continue;
+        }
+        int st[1005], n = 0, c = i;
+        while (c != -1) {
+            st[n++] = c;
+            c = p[c];
+        }
+        printf("%d %lld ", i, d[i]);
+        for (j = n - 1; j >= 0; j--) {
+            printf("%d", st[j]);
+            if (j > 0)
+                printf("->");
+        }
+        printf("\n");
+    }
+    return 0;
+}
